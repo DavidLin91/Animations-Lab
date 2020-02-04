@@ -15,11 +15,16 @@ class ViewController: UIViewController {
     let leftButton = UIButton()
     let rightButton = UIButton()
     
+    
+    private let animationOptions = ["transitionFlipFromLeft", "transitionCurlUp", "transitionFlipFromBottom", "transitionCrossDissovle"]
+    
+    var animationStyle: String?
+    
     let animationDuration = 2
     
     lazy var blueSquare: UIView = {
         let view = UIView()
-        view.backgroundColor = .blue
+        view.backgroundColor = .systemTeal
         return view
     }()
     
@@ -62,20 +67,48 @@ class ViewController: UIViewController {
         return allDirectionButtons
     }
     
-   lazy var animationTimeStepper: UIStepper = {
-    let animationStepper = UIStepper(frame: CGRect(x: 10, y: 150, width: 0, height: 0))
-    animationStepper.wraps = true
-    animationStepper.center = self.view.center
-    animationStepper.autorepeat = true
-    animationStepper.maximumValue = 5
-    animationStepper.addTarget(self, action: #selector(animationStepperPressed(sender:)), for: .touchUpInside)
-    return animationStepper
+    lazy var animationStepperLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .left
+        label.text = "Animation Time:"
+        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        return label
     }()
     
+    lazy var animationTimeStepper: UIStepper = {
+        let animationStepper = UIStepper(frame: CGRect(x: 10, y: 150, width: 0, height: 0))
+        animationStepper.wraps = true
+        animationStepper.center = self.view.center
+        animationStepper.autorepeat = true
+        animationStepper.maximumValue = 5
+        animationStepper.addTarget(self, action: #selector(animationStepperPressed(sender:)), for: .touchUpInside)
+        return animationStepper
+    }()
     
+    lazy var distanceStepperLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .left
+        label.text = "Distance:"
+        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        return label
+    }()
     
+    lazy var distanceStepper: UIStepper = {
+        let animationStepper = UIStepper(frame: CGRect(x: 10, y: 150, width: 0, height: 0))
+        animationStepper.wraps = true
+        animationStepper.center = self.view.center
+        animationStepper.autorepeat = true
+        animationStepper.maximumValue = 5
+        animationStepper.addTarget(self, action: #selector(distanceStepperPressed(sender:)), for: .touchUpInside)
+        return animationStepper
+    }()
     
+    lazy var animationPickerView: UIPickerView = {
+        let pickerView = UIPickerView()
+        return pickerView
+    }()
     
+
     lazy var blueSquareHeightConstaint: NSLayoutConstraint = {
         blueSquare.heightAnchor.constraint(equalToConstant: 200)
     }()
@@ -91,6 +124,16 @@ class ViewController: UIViewController {
     lazy var blueSquareCenterYConstraint: NSLayoutConstraint = {
         blueSquare.centerYAnchor.constraint(equalTo: view.centerYAnchor)
     }()
+    
+    
+    
+    override func viewDidLayoutSubviews() {
+        upButton.layer.cornerRadius = 8.0
+        downButton.layer.cornerRadius = 8.0
+        leftButton.layer.cornerRadius = 8.0
+        rightButton.layer.cornerRadius = 8.0
+    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -126,13 +169,22 @@ class ViewController: UIViewController {
     @IBAction func animateSquareRight(sender: UIButton) {
         let oldOffet = blueSquareCenterXConstraint.constant
         blueSquareCenterXConstraint.constant = oldOffet + 150
-        UIView.animate(withDuration: 2) { [unowned self] in
+        UIView.animate(withDuration: animationTimeStepper.value) { [unowned self] in
             self.view.layoutIfNeeded()
         }
     }
     
     
     @IBAction func animationStepperPressed(sender: UIStepper) {
+     let stepper = UIStepper()
+        stepper.minimumValue = 1
+        stepper.maximumValue = 5
+        stepper.stepValue = 1
+        stepper.value = 1
+    }
+    
+    
+    @IBAction func distanceStepperPressed(sender: UIStepper) {
         
     }
     
@@ -141,6 +193,10 @@ class ViewController: UIViewController {
         view.addSubview(blueSquare)
         addStackViewSubviews()
         view.addSubview(buttonStackView)
+        view.addSubview(animationTimeStepper)
+        view.addSubview(animationStepperLabel)
+        view.addSubview(distanceStepperLabel)
+        view.addSubview(distanceStepper)
     }
     
     private func addStackViewSubviews() {
@@ -152,39 +208,45 @@ class ViewController: UIViewController {
     
     private func configureConstraints() {
         constrainBlueSquare()
-        constraintAnimationStepper()
         constrainUpButton()
         constrainDownButton()
         constrainLeftButton()
         constrainRightButton()
         constrainButtonStackView()
+        constraintAnimationStepperLabel()
+        constraintAnimationStepper()
+        constraintDistanceStepperLabel()
+        constraintDistanceStepper()
+        
     }
     
     
     private func constrainUpButton() {
         upButton.translatesAutoresizingMaskIntoConstraints = false
-        upButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        upButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        upButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        upButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
         upButton.tintColor = .systemTeal
     }
     
     private func constrainDownButton() {
         downButton.translatesAutoresizingMaskIntoConstraints = false
-        downButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        downButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        
+        downButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        downButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        downButton.tintColor = .systemTeal
     }
     
     private func constrainLeftButton() {
         leftButton.translatesAutoresizingMaskIntoConstraints = false
-        leftButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        leftButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        leftButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        leftButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        leftButton.tintColor = .systemTeal
     }
     
     private func constrainRightButton() {
         rightButton.translatesAutoresizingMaskIntoConstraints = false
-        rightButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        rightButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        rightButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        rightButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        rightButton.tintColor = .systemTeal
     }
     
     private func constrainBlueSquare() {
@@ -201,24 +263,71 @@ class ViewController: UIViewController {
         buttonStackView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            buttonStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 75),
-            buttonStackView.heightAnchor.constraint(equalToConstant: 50),
-            buttonStackView.widthAnchor.constraint(equalTo: view.widthAnchor)
+            buttonStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
+            buttonStackView.heightAnchor.constraint(equalToConstant: 60),
+            buttonStackView.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -30)
         ])
     }
+    
+    
+    private func constraintAnimationStepperLabel() {
+        animationStepperLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            animationStepperLabel.topAnchor.constraint(equalTo: buttonStackView.bottomAnchor, constant: 20),
+            animationStepperLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            animationStepperLabel.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
+    
     
     private func constraintAnimationStepper() {
         animationTimeStepper.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-//        animationTimeStepper.topAnchor.constraint(equalTo: buttonStackView.bottomAnchor, constant: 20),
-//        animationTimeStepper.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-//        animationTimeStepper.heightAnchor.constraint(equalToConstant: 50)
-    ])
+            animationTimeStepper.topAnchor.constraint(equalTo: buttonStackView.bottomAnchor, constant: 30),
+            animationTimeStepper.leadingAnchor.constraint(equalTo: animationStepperLabel.trailingAnchor, constant: 20),
+            animationTimeStepper.heightAnchor.constraint(equalToConstant: 50)
+        ])
     }
     
     
+    private func constraintDistanceStepperLabel() {
+        distanceStepperLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            distanceStepperLabel.topAnchor.constraint(equalTo: animationStepperLabel.bottomAnchor, constant: 10),
+            distanceStepperLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            distanceStepperLabel.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
     
+    
+    private func constraintDistanceStepper() {
+        distanceStepper.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            distanceStepper.topAnchor.constraint(equalTo: animationTimeStepper.bottomAnchor, constant: 10),
+            distanceStepper.leadingAnchor.constraint(equalTo: distanceStepperLabel.trailingAnchor, constant: 84),
+            distanceStepper.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
     
 }
 
 
+extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return animationOptions.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return animationOptions[row]
+    }
+    
+        func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        let transition = animationOptions[row]
+            animationStyle = transition
+    }
+    
+}
